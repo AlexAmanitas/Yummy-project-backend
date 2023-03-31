@@ -17,7 +17,7 @@ const { sendEmail } = require('./emailServise');
 const { SECRET_KEY } = process.env;
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, 'Email in use');
@@ -25,10 +25,9 @@ const register = async (req, res) => {
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
   const verificationToken = uuid.v4();
   await User.create({
+    name,
     email,
     password: hashPassword,
-    avatarURL: avatarUrl,
-    subscription: 'starter',
     verificationToken: verificationToken,
   });
 
@@ -37,9 +36,9 @@ const register = async (req, res) => {
 
   res.status(201).json({
     user: {
+      _id,
+      name,
       email,
-      avatarURL: avatarUrl,
-      subscription: 'starter',
       verificationToken: verificationToken,
     },
   });
