@@ -3,8 +3,6 @@ const { HttpError, ctrlWrapper } = require('../helpers');
 
 const bcrypt = require('bcrypt');
 
-const gravatar = require('gravatar');
-
 const jwt = require('jsonwebtoken');
 
 const path = require('path');
@@ -25,7 +23,6 @@ const register = async (req, res) => {
     throw HttpError(409, 'Email in use');
   }
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  const avatarUrl = gravatar.url(email, { s: '200', r: 'pg', d: '404' });
   const verificationToken = uuid.v4();
   await User.create({
     email,
