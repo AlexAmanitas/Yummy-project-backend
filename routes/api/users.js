@@ -4,38 +4,12 @@ const router = express.Router();
 
 const { auth, validateBody, upload } = require('../../middlewares');
 
-const {
-  userRegisterSchema,
-  userLoginSchema,
-  userStatusSchema,
-  userVerifySchema,
-} = require('../../schemas/users');
+const { userUpdateSchema } = require('../../schemas/users');
 
-const {
-  register,
-  logIn,
-  logOut,
-  getCurrentUser,
-  updateUser,
-  updateAvatar,
-  userVerification,
-  resendEmail,
-} = require('../../controllers/auth');
+const { getCurrentUser, updateUser } = require('../../controllers/auth');
 
-router.post('/register', validateBody(userRegisterSchema), register);
+router.get('/', auth, getCurrentUser);
 
-router.post('/signin', validateBody(userLoginSchema), logIn);
-
-router.get('/logout', auth, logOut);
-
-router.get('/current', auth, getCurrentUser);
-
-router.patch('/', auth, validateBody(userStatusSchema), updateUser);
-
-router.patch('/avatar', auth, upload.single('avatar'), updateAvatar);
-
-router.get('/verify/:verificationToken', userVerification);
-
-router.post('/verify', validateBody(userVerifySchema), resendEmail);
+router.patch('/', auth, validateBody(userUpdateSchema), updateUser);
 
 module.exports = router;

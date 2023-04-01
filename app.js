@@ -4,7 +4,8 @@ const cors = require('cors');
 require('dotenv').config();
 
 const recipesRouter = require('./routes/api/recipes');
-const authRouter = require('./routes/api/users');
+const authRouter = require('./routes/api/auth');
+const userRouter = require('./routes/api/users');
 
 const app = express();
 
@@ -20,7 +21,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/auth', authRouter);
-app.use('/api/recipes', recipesRouter);
+app.use('/recipes', recipesRouter);
+app.use('/user', userRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found app' });

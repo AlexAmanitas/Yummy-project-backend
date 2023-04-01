@@ -42,7 +42,7 @@ const register = async (req, res) => {
   res.status(201).json({
     token,
     user: {
-      id: _id,
+      id: registerUser._id,
       name,
       email,
       avatar: avatarUrl,
@@ -67,10 +67,10 @@ const logIn = async (req, res) => {
   res.status(200).json({
     token,
     user: {
-      id: _id,
+      id: user._id,
       name: user.name,
       email,
-      avatar: avatarUrl,
+      avatar: user.avatar,
     },
   });
 };
@@ -85,16 +85,25 @@ const getCurrentUser = async (req, res) => {
   const { _id } = req.user;
   const user = await User.findById(_id);
   res.status(200).json({
+    id: user._id,
+    name: user.name,
     email: user.email,
+    avatar: user.avatar,
   });
 };
 
 const updateUser = async (req, res) => {
-  const { subscription } = req.body;
+  const { name, avatar } = req.body;
   const { _id } = req.user;
-  const user = await User.findByIdAndUpdate(_id, { subscription });
+  const updateObject = {};
+  if (name) updateObject.name = name;
+  if (name) updateObject.avatar = avatar;
+  const user = await User.findByIdAndUpdate(_id, updateObject);
   res.status(200).json({
-    data: { user },
+    id: user._id,
+    name: name,
+    email: user.email,
+    avatar: user.avatar,
   });
 };
 

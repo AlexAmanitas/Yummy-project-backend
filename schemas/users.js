@@ -10,8 +10,9 @@ const userLoginSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
-const userStatusSchema = Joi.object({
-  subscription: Joi.string().valid('starter', 'pro', 'business'),
+const userUpdateSchema = Joi.object({
+  name: Joi.string(),
+  avatar: Joi.string(),
 });
 
 const userVerifySchema = Joi.object({
@@ -21,6 +22,6 @@ const userVerifySchema = Joi.object({
 module.exports = {
   userRegisterSchema,
   userLoginSchema,
-  userStatusSchema,
+  userUpdateSchema,
   userVerifySchema,
 };
