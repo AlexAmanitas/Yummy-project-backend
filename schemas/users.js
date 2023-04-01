@@ -1,7 +1,11 @@
 const Joi = require('joi');
 
-const userSchema = Joi.object({
+const userRegisterSchema = Joi.object({
   name: Joi.string().required(),
+  email: Joi.string().required(),
+  password: Joi.string().min(6).required(),
+});
+const userLoginSchema = Joi.object({
   email: Joi.string().required(),
   password: Joi.string().min(6).required(),
 });
@@ -14,4 +18,9 @@ const userVerifySchema = Joi.object({
   email: Joi.string().required(),
 });
 
-module.exports = { userSchema, userStatusSchema, userVerifySchema };
+module.exports = {
+  userRegisterSchema,
+  userLoginSchema,
+  userStatusSchema,
+  userVerifySchema,
+};

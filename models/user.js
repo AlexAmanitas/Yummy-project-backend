@@ -1,6 +1,10 @@
 const { model, Schema } = require('mongoose');
 
 const userSchema = new Schema({
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+  },
   password: {
     type: String,
     required: [true, 'Password is required'],
@@ -13,22 +17,10 @@ const userSchema = new Schema({
   avatarURL: {
     type: String,
   },
-  subscription: {
-    type: String,
-    enum: ['starter', 'pro', 'business'],
-    default: 'starter',
-  },
+
   token: {
     type: String,
     default: null,
-  },
-  verify: {
-    type: Boolean,
-    default: false,
-  },
-  verificationToken: {
-    type: String,
-    required: [true, 'Verify token is required'],
   },
 });
 

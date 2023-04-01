@@ -5,7 +5,8 @@ const router = express.Router();
 const { auth, validateBody, upload } = require('../../middlewares');
 
 const {
-  userSchema,
+  userRegisterSchema,
+  userLoginSchema,
   userStatusSchema,
   userVerifySchema,
 } = require('../../schemas/users');
@@ -15,21 +16,21 @@ const {
   logIn,
   logOut,
   getCurrentUser,
-  updateUserStatus,
+  updateUser,
   updateAvatar,
   userVerification,
   resendEmail,
 } = require('../../controllers/auth');
 
-router.post('/signup', validateBody(userSchema), register);
+router.post('/signup', validateBody(userRegisterSchema), register);
 
-router.post('/login', validateBody(userSchema), logIn);
+router.post('/login', validateBody(userLoginSchema), logIn);
 
 router.get('/logout', auth, logOut);
 
 router.get('/current', auth, getCurrentUser);
 
-router.patch('/', auth, validateBody(userStatusSchema), updateUserStatus);
+router.patch('/', auth, validateBody(userStatusSchema), updateUser);
 
 router.patch('/avatar', auth, upload.single('avatar'), updateAvatar);
 

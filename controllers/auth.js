@@ -23,22 +23,26 @@ const register = async (req, res) => {
     throw HttpError(409, 'Email in use');
   }
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  const verificationToken = uuid.v4();
+
   await User.create({
     name,
     email,
     password: hashPassword,
-    verificationToken: verificationToken,
   });
+  const registerUser = await User.findOne({ email });
+  const payload = { id: registerUser._id };
+  console.log(payload);
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '5d' });
+  await User.findByIdAndUpdate(registerUser._id, { token });
 
-  sendEmail('gotvald@yahoo.com', verificationToken);
+  // sendEmail('gotvald@yahoo.com', verificationToken);
   // sendEmail(user.email, verificationToken);
 
   res.status(201).json({
     user: {
       name,
       email,
-      verificationToken: verificationToken,
+      token,
     },
   });
 };
@@ -54,13 +58,14 @@ const logIn = async (req, res) => {
   //   throw HttpError(401, 'Email not verify');
   // }
   const payload = { id: user._id };
-  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '2d' });
+  console.log(payload);
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '5d' });
   await User.findByIdAndUpdate(user._id, { token });
   res.status(200).json({
     token,
     user: {
+      name: user.name,
       email,
-      subscription: 'starter',
     },
   });
 };
@@ -70,16 +75,16 @@ const logOut = async (req, res) => {
   await User.findByIdAndUpdate(_id, { token: null });
   res.status(204).json();
 };
+
 const getCurrentUser = async (req, res) => {
   const { _id } = req.user;
   const user = await User.findById(_id);
   res.status(200).json({
     email: user.email,
-    subscription: user.subscription,
   });
 };
 
-const updateUserStatus = async (req, res) => {
+const updateUser = async (req, res) => {
   const { subscription } = req.body;
   const { _id } = req.user;
   const user = await User.findByIdAndUpdate(_id, { subscription });
@@ -146,7 +151,7 @@ module.exports = {
   logIn: ctrlWrapper(logIn),
   logOut: ctrlWrapper(logOut),
   getCurrentUser: ctrlWrapper(getCurrentUser),
-  updateUserStatus: ctrlWrapper(updateUserStatus),
+  updateUser: ctrlWrapper(updateUser),
   updateAvatar: ctrlWrapper(updateAvatar),
   userVerification: ctrlWrapper(userVerification),
   resendEmail: ctrlWrapper(resendEmail),
