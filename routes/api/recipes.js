@@ -10,11 +10,17 @@ const {
   contactPatchShema,
 } = require('../../schemas/contacts');
 
-const { categoryList, mainPage } = require('../../controllers/recipes');
+const {
+  categoryList,
+  mainPage,
+  getRcipesByCategory,
+} = require('../../controllers/recipes');
 
-router.get('/category-list', categoryList);
+router.get('/category-list', auth, categoryList);
 
-router.get('/main-page', mainPage);
+router.get('/main-page', auth, mainPage);
+
+router.get('/category/:category', auth, getRcipesByCategory);
 
 // router.post('/', auth, validateBody(contactPostShema), add);
 

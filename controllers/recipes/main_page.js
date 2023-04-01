@@ -16,6 +16,10 @@ const mainPage = async (req, res) => {
     limit: 4,
   });
 
+  if (!array1 || !array2 || !array3 || !array4) {
+    throw HttpError(404, 'Not found');
+  }
+
   const data = [...array1, ...array2, ...array3, ...array4];
   res.status(200).json({
     status: 'success',
@@ -24,4 +28,4 @@ const mainPage = async (req, res) => {
   });
 };
 
-module.exports = mainPage;
+module.exports = ctrlWrapper(mainPage);

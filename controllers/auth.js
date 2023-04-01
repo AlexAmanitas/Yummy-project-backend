@@ -23,11 +23,12 @@ const register = async (req, res) => {
     throw HttpError(409, 'Email in use');
   }
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-
+  const avatarUrl = 'https://pin.it/1CT1WFj';
   await User.create({
     name,
     email,
     password: hashPassword,
+    avatar: avatarUrl,
   });
   const registerUser = await User.findOne({ email });
   const payload = { id: registerUser._id };
@@ -39,10 +40,12 @@ const register = async (req, res) => {
   // sendEmail(user.email, verificationToken);
 
   res.status(201).json({
+    token,
     user: {
+      id: _id,
       name,
       email,
-      token,
+      avatar: avatarUrl,
     },
   });
 };
@@ -64,8 +67,10 @@ const logIn = async (req, res) => {
   res.status(200).json({
     token,
     user: {
+      id: _id,
       name: user.name,
       email,
+      avatar: avatarUrl,
     },
   });
 };

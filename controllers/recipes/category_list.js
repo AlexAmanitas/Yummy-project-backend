@@ -25,4 +25,4 @@ const categoryList = async (req, res) => {
   });
 };
 
-module.exports = categoryList;
+module.exports = ctrlWrapper(categoryList);

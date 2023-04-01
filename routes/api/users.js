@@ -22,9 +22,9 @@ const {
   resendEmail,
 } = require('../../controllers/auth');
 
-router.post('/signup', validateBody(userRegisterSchema), register);
+router.post('/register', validateBody(userRegisterSchema), register);
 
-router.post('/login', validateBody(userLoginSchema), logIn);
+router.post('/signin', validateBody(userLoginSchema), logIn);
 
 router.get('/logout', auth, logOut);
 
