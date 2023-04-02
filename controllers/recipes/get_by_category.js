@@ -1,13 +1,22 @@
 const { HttpError, ctrlWrapper } = require('../../helpers');
 const Recipe = require('../../models/recipe');
+const Category = require('../../models/category');
+const Ingredient = require('../../models/ingredient');
 
-const getRcipesByCategory = async (req, res) => {
-  const { category } = req.params;
-  const { page = 1, limit = 8 } = req.query;
+const getRecipesByCategory = async (req, res) => {
+  const { category, title, page = 1, limit = 8 } = req.query;
+
+  const queryParams = {};
+  if (category) {
+    const categories = await Category.find({ _id: category });
+    queryParams.category = categories[0].name;
+  }
+  if (title) queryParams.title = title;
+
   const paginationParams = { skip: (page - 1) * limit, limit: +limit };
-  console.log(category, page, limit);
+  // console.log('QUERY', queryParams, page, limit);
 
-  const data = await Recipe.find({ category }, '', paginationParams);
+  const data = await Recipe.find(queryParams, '', paginationParams);
   if (!data) {
     throw HttpError(404, 'Not found');
   }
@@ -18,4 +27,4 @@ const getRcipesByCategory = async (req, res) => {
   });
 };
 
-module.exports = ctrlWrapper(getRcipesByCategory);
+module.exports = ctrlWrapper(getRecipesByCategory);

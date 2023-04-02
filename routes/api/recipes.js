@@ -13,14 +13,15 @@ const {
 const {
   categoryList,
   mainPage,
-  getRcipesByCategory,
+  searchByIngredient,
+  getRecipesByCategory,
 } = require('../../controllers/recipes');
 
 router.get('/category-list', auth, categoryList);
 
 router.get('/main-page', auth, mainPage);
 
-router.get('/category/:category', auth, getRcipesByCategory);
+router.get('/', auth, getRecipesByCategory);
 
 // router.post('/', auth, validateBody(contactPostShema), add);
 

@@ -1,27 +1,17 @@
 const { HttpError, ctrlWrapper } = require('../../helpers');
 
+const Category = require('../../models/category');
+
 const categoryList = async (req, res) => {
-  const categoryList = [
-    { 1: 'Beef' },
-    { 2: 'Breakfast' },
-    { 3: 'Chicken' },
-    { 4: 'Dessert' },
-    { 5: 'Goat' },
-    { 6: 'Lamb' },
-    { 7: 'Miscellaneous' },
-    { 8: 'Pasta' },
-    { 9: 'Pork' },
-    { 10: 'Seafood' },
-    { 11: 'Side' },
-    { 12: 'Starter' },
-    { 13: 'Vegan' },
-    { 14: 'Vegetarian' },
-  ];
+  const result = await Category.find();
+  if (!result) {
+    throw HttpError(404, 'Not found');
+  }
 
   res.status(200).json({
     status: 'success',
     code: 200,
-    data: { categoryList },
+    data: result,
   });
 };
 
