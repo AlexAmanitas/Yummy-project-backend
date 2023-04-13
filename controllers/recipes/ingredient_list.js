@@ -1,9 +1,8 @@
 const { HttpError, ctrlWrapper } = require('../../helpers');
+const Ingredient = require('../../models/ingredient');
 
-const Category = require('../../models/category');
-
-const categoryList = async (req, res) => {
-  const data = await Category.find();
+const getIngredientsList = async (req, res) => {
+  const data = await Ingredient.find();
   if (!data) {
     throw HttpError(404, 'Not found');
   }
@@ -15,4 +14,4 @@ const categoryList = async (req, res) => {
   });
 };
 
-module.exports = ctrlWrapper(categoryList);
+module.exports = ctrlWrapper(getIngredientsList);

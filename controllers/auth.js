@@ -2,17 +2,8 @@ const User = require('../models/user');
 const { HttpError, ctrlWrapper } = require('../helpers');
 
 const bcrypt = require('bcrypt');
-
+const io = require('../socket');
 const jwt = require('jsonwebtoken');
-
-const path = require('path');
-const fs = require('fs/promises');
-
-const uuid = require('uuid');
-
-const { jimp } = require('../middlewares');
-
-const { sendEmail } = require('./emailServise');
 
 const { SECRET_KEY } = process.env;
 
@@ -23,7 +14,9 @@ const register = async (req, res) => {
     throw HttpError(409, 'Email in use');
   }
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  const avatarUrl = 'https://pin.it/1CT1WFj';
+  const avatarUrl =
+    'https://res.cloudinary.com/dsseiacfv/image/upload/v1680621422/avatars/rgvildvqnsh1qqyiibhx.jpg';
+
   await User.create({
     name,
     email,
@@ -32,13 +25,8 @@ const register = async (req, res) => {
   });
   const registerUser = await User.findOne({ email });
   const payload = { id: registerUser._id };
-  console.log(payload);
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '5d' });
   await User.findByIdAndUpdate(registerUser._id, { token });
-
-  // sendEmail('gotvald@yahoo.com', verificationToken);
-  // sendEmail(user.email, verificationToken);
-
   res.status(201).json({
     token,
     user: {
@@ -53,17 +41,19 @@ const register = async (req, res) => {
 const logIn = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
-  const passCompare = bcrypt.compareSync(password, user.password);
-  if (!user || !passCompare) {
+  if (!user) {
     throw HttpError(401, 'Email or password is wrong');
   }
-  // if (!user.verify) {
-  //   throw HttpError(401, 'Email not verify');
-  // }
+  const passCompare = bcrypt.compareSync(password, user.password);
+  if (!passCompare) {
+    throw HttpError(401, 'Email or password is wrong');
+  }
   const payload = { id: user._id };
   console.log(payload);
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '5d' });
   await User.findByIdAndUpdate(user._id, { token });
+  io.emit('userRegister', { name: user.name });
+
   res.status(200).json({
     token,
     user: {
@@ -81,92 +71,8 @@ const logOut = async (req, res) => {
   res.status(204).json();
 };
 
-const getCurrentUser = async (req, res) => {
-  const { _id } = req.user;
-  const user = await User.findById(_id);
-  res.status(200).json({
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    avatar: user.avatar,
-  });
-};
-
-const updateUser = async (req, res) => {
-  const { name, avatar } = req.body;
-  const { _id } = req.user;
-  const updateObject = {};
-  if (name) updateObject.name = name;
-  if (name) updateObject.avatar = avatar;
-  const user = await User.findByIdAndUpdate(_id, updateObject);
-  res.status(200).json({
-    id: user._id,
-    name: name,
-    email: user.email,
-    avatar: user.avatar,
-  });
-};
-
-const updateAvatar = async (req, res) => {
-  const { _id } = req.user;
-  const { path: tempUpload, originalname } = req.file;
-
-  const avatarFileName = `${_id}_${originalname}`;
-  const resultUpload = path.join('public', 'avatars', avatarFileName);
-
-  try {
-    await fs.rename(tempUpload, resultUpload);
-
-    const avatarURL = path.join('public', 'avatars', avatarFileName);
-    await User.findByIdAndUpdate(_id, { avatarURL });
-
-    res.status(200).json({ avatarURL });
-  } catch (error) {
-    await fs.unlink(tempUpload);
-  }
-  jimp(resultUpload);
-};
-
-const userVerification = async (req, res) => {
-  const { verificationToken } = req.params;
-  const user = await User.findOne({ verificationToken: verificationToken });
-  if (!user) {
-    throw HttpError(404, 'User not found');
-  }
-  await User.findOneAndUpdate(
-    { email: user.email },
-    {
-      verificationToken: null,
-      verify: true,
-    }
-  );
-  res.status(200).json({
-    status: 'OK',
-    message: 'Verification successful',
-  });
-};
-
-const resendEmail = async (req, res) => {
-  const user = await User.findOne(req.body);
-  if (!user.verificationToken) {
-    throw HttpError(409, 'Email has already been verified ');
-  }
-  sendEmail('gotvald@yahoo.com', user.verificationToken);
-  // sendEmail(user.email, user.verificationToken);
-
-  res.status(200).json({
-    status: 'OK',
-    message: 'Verification email sent',
-  });
-};
-
 module.exports = {
   register: ctrlWrapper(register),
   logIn: ctrlWrapper(logIn),
   logOut: ctrlWrapper(logOut),
-  getCurrentUser: ctrlWrapper(getCurrentUser),
-  updateUser: ctrlWrapper(updateUser),
-  updateAvatar: ctrlWrapper(updateAvatar),
-  userVerification: ctrlWrapper(userVerification),
-  resendEmail: ctrlWrapper(resendEmail),
 };

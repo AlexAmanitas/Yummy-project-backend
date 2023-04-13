@@ -2,38 +2,36 @@ const express = require('express');
 
 const router = express.Router();
 
-const { validateBody, auth } = require('../../middlewares');
-
-const {
-  contactPostShema,
-  contactPutShema,
-  contactPatchShema,
-} = require('../../schemas/contacts');
+const { auth } = require('../../middlewares');
 
 const {
   categoryList,
   mainPage,
-  searchByIngredient,
+  getRecipeById,
   getRecipesByCategory,
+  getIngredientsList,
+  getPopularRecipes,
+  getFavoriteRecipes,
+  addFavoriteRecipes,
+  removeFavoriteRecipes,
 } = require('../../controllers/recipes');
-
-router.get('/category-list', auth, categoryList);
-
-router.get('/main-page', auth, mainPage);
 
 router.get('/', auth, getRecipesByCategory);
 
-// router.post('/', auth, validateBody(contactPostShema), add);
+router.get('/categories', auth, categoryList);
 
-// router.delete('/:contactId', auth, deleteById);
+router.get('/ingredients', auth, getIngredientsList);
 
-// router.put('/:contactId', auth, validateBody(contactPutShema), updateById);
+router.get('/main-page', auth, mainPage);
 
-// router.patch(
-//   '/:contactId/favorite',
-//   auth,
-//   validateBody(contactPatchShema),
-//   updateStatus
-// );
+router.get('/popular', auth, getPopularRecipes);
+
+router.get('/favorite', auth, getFavoriteRecipes);
+
+router.get('/id/:id', auth, getRecipeById);
+
+router.post('/favorite', auth, addFavoriteRecipes);
+
+router.delete('/favorite/:id', auth, removeFavoriteRecipes);
 
 module.exports = router;
