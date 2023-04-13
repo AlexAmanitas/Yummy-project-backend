@@ -37,6 +37,6 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message: err.message });
 });
 
-io.listen(443);
+io.listen(5050);
 
 module.exports = app;
